@@ -80,6 +80,26 @@ class Database:
             data.append(dict(zip(table, db_data[0])))
         except IndexError:
             raise ObjectDoesNotExist(f"Tip with '{column_name}' - '{str(value)}' does not exist")
-        return data 
+        return data
+
+    def insert_row(self, table_name, data):
+        query_ids = "SELECT id FROM " + table_name
+        ids = self.execute_query(query_ids)
+        last_id = ids[-1][0]
+        query = "INSERT INTO " + table_name + " (id, "
+        for key, value in data.items():
+            query += key + ", "
+        query = query[:-2] + ") VALUES ('" + str(last_id+1) + "', "
+        for key, value in data.items():
+            query += "'" + str(value).replace("'", str("\'")) + "', "
+        query = query[:-2] + ");"
+        self.connect_to_db()
+        try:
+            self.__cursor.execute(query)
+            self.__connection.commit()
+        except (Exception, psycopg2.Error) as error:
+            raise Exception(error)
+        finally:
+            self.close_db_connection()
 
 database = Database()
