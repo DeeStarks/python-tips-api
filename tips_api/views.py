@@ -33,7 +33,7 @@ def fetch_tip(request, tip_id):
     try:
         data["data"] = database.select_row(
             table_name='tips_pythontip',
-            column_name='id',
+            target_column='id',
             value=tip_id
         )
     except ObjectDoesNotExist:
@@ -80,32 +80,31 @@ def add_tip(request):
 
     # Add tip to database
     try:
-        database.insert_row(
+        data = database.insert_row(
             table_name='tips_pythontip',
             data=data
         )
+
+        # Posting the data to python tips web form
+        # url = "https://docs.google.com/forms/d/e/1FAIpQLScsHklRH2-uplGYH_vxhtIin-zJS44bXQkAWCH7_N7nUdrGXw/viewform"
+        # content = requests.get(url).content
+        # soup = BeautifulSoup(content, "html.parser").find_all("form")[0]
+        # payload = {
+        #     "tip": "Test",
+        #     "poster": "Daniel",
+        #     "poster_email": "daniel@mail.com"
+        # }
+        # post = requests.post(url, data=payload)
+        # print(post.content)
+        return Response(data=data, status=status.HTTP_200_OK)
     except Exception:
         return Response(data={"status": False, "message": "Error inserting tip. Check the string format of 'tip' and make sure it contains valid characters"}, status=status.HTTP_400_BAD_REQUEST)
-
-    # Posting the data to python tips web form
-    # url = "https://docs.google.com/forms/d/e/1FAIpQLScsHklRH2-uplGYH_vxhtIin-zJS44bXQkAWCH7_N7nUdrGXw/viewform"
-    # content = requests.get(url).content
-    # soup = BeautifulSoup(content, "html.parser").find_all("form")[0]
-    # payload = {
-    #     "tip": "Test",
-    #     "poster": "Daniel",
-    #     "poster_email": "daniel@mail.com"
-    # }
-    # post = requests.post(url, data=payload)
-    # print(post.content)
-
-    return Response(data=data, status=status.HTTP_200_OK)
 
 @api_view(['PUT'])
 def update_tip(request, tip_id):
     data = {
         "status": True,
-        "message": "Fetched successfully"
+        "message": "Update successful"
     }
 
     if tip_id not in [tip.get("id") for tip in database.select_table('tips_pythontip')]:
@@ -134,4 +133,19 @@ def update_tip(request, tip_id):
             )
     except Exception:
         return Response(data={"status": False, "message": "Error updating tip. Check the string format of 'tip' and make sure it contains valid characters"}, status=status.HTTP_400_BAD_REQUEST)
+    return Response(data=data, status=status.HTTP_200_OK)
+
+@api_view(['DELETE'])
+def delete_tip(request, tip_id):
+    data = {
+        "status": True,
+        "message": "Deleted successfully"
+    }
+    if tip_id not in [tip.get("id") for tip in database.select_table('tips_pythontip')]:
+        return Response(data={"status": False, "message": "No such tip"}, status=status.HTTP_400_BAD_REQUEST)
+    database.delete_row(
+        table_name='tips_pythontip',
+        target_column='id',
+        value=tip_id
+    )
     return Response(data=data, status=status.HTTP_200_OK)
