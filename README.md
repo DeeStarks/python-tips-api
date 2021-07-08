@@ -31,4 +31,6 @@ NB: Adding tips only sends data to the database. It does not send data to the we
     > ```
     > Note: "poster_email" is optional, while "tip" and "poster" is required.
     
+- `PUT /tips/update/<int:tip_id>` - Update a specific tip
+- `DELETE /tips/delete/<int:tip_id>` - Delete a specific tip
 - An algorithm checks to see matches between the tip and the existing tips database. If the matches found are above a 50% threshold against an existing tip, the algorithm will ignore the new tip and return a message to the user.
