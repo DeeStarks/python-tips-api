@@ -35,6 +35,10 @@ class Database:
         except (Exception, psycopg2.Error) as error:
             print("Error while connecting to PostgreSQL", error)
 
+    def close_db_connection(self):
+        self.__connection.close()
+        self.__cursor.close()
+
     def describe_table(self, table_name):
         self.connect_to_db()
         try:
@@ -73,9 +77,5 @@ class Database:
         db_data = self.execute_query(query)
         data.append(dict(zip(table, db_data[0]))) 
         return data 
-
-    def close_db_connection(self):
-        self.__connection.close()
-        self.__cursor.close()
 
 database = Database()
