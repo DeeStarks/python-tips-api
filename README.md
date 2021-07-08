@@ -15,6 +15,8 @@ DB_PASSWORD=
 
 ### Features and Usage
 
+NB: Adding tips only sends data to the database. It does not send data to the web form created by [@python_tip](https://twitter.com/python_tip) because the algorithm written to submit post requests to the form is returning a response from google drive. Funny right? Haha, I know. It has been commented out in the code.
+
 - `GET /tips` - Get all tips
 - `GET /tips/<int:tip_id>` - Get a specific tip
 - `POST /tips/add` - Create a new tip
