@@ -1,6 +1,7 @@
 import psycopg2
 from psycopg2 import Error
 import environ
+from django.core.exceptions import ObjectDoesNotExist
 
 env = environ.Env()
 environ.Env.read_env()
@@ -69,13 +70,16 @@ class Database:
             data.append(dict(zip(table, row)))
         return data
 
-    def select_row(self, table_name, key, value):
+    def select_row(self, table_name, column_name, value):
         data = []
-        query = "SELECT * FROM " + table_name + " WHERE " + key + " = '" + value + "'"
+        query = "SELECT * FROM " + table_name + " WHERE " + column_name + " = '" + str(value) + "'"
         table = self.describe_table(table_name)
         table = [col.name for col in table]
         db_data = self.execute_query(query)
-        data.append(dict(zip(table, db_data[0]))) 
+        try:
+            data.append(dict(zip(table, db_data[0])))
+        except IndexError:
+            raise ObjectDoesNotExist(f"Tip with '{column_name}' - '{str(value)}' does not exist")
         return data 
 
 database = Database()
