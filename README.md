@@ -18,6 +18,7 @@ DB_PASSWORD=
 - `GET /tips` - Get all tips
 - `GET /tips/<int:tip_id>` - Get a specific tip
 - `POST /tips/add` - Create a new tip
+
     > Object should be in the format:
     > ```json
     > {
@@ -27,4 +28,5 @@ DB_PASSWORD=
     > }
     > ```
     > Note: "poster_email" is optional, while "tip" and "poster" is required.
+    
 - An algorithm checks to see matches between the tip and the existing tips database. If the matches found are above a 50% threshold against an existing tip, the algorithm will ignore the new tip and return a message to the user.
