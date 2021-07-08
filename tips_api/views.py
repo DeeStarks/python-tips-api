@@ -7,7 +7,7 @@ from python_tips_api.db_connection import database
 
 # Create your views here.
 @api_view(['GET'])
-def fetchall(request):
+def fetch_tips(request):
     data = {
         "status": True,
         "message": "Fetched successfully"

@@ -2,5 +2,5 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path('tips/all', views.fetchall),
+    path('tips', views.fetch_tips),
 ]
