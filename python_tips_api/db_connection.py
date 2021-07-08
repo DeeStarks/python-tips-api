@@ -72,16 +72,16 @@ class Database:
         data = sorted(data, key=lambda i: i['id'], reverse=True)
         return data
 
-    def select_row(self, table_name, column_name, value):
+    def select_row(self, table_name, target_column, value):
         data = []
-        query = "SELECT * FROM " + table_name + " WHERE " + column_name + " = '" + str(value) + "'"
+        query = "SELECT * FROM " + table_name + " WHERE " + target_column + " = '" + str(value) + "'"
         table = self.describe_table(table_name)
         table = [col.name for col in table]
         db_data = self.execute_query(query)
         try:
             data.append(dict(zip(table, db_data[0])))
         except IndexError:
-            raise ObjectDoesNotExist(f"Tip with '{column_name}' - '{str(value)}' does not exist")
+            raise ObjectDoesNotExist(f"Tip with '{target_column}' - '{str(value)}' does not exist")
         return data
 
     def insert_row(self, table_name, data):
@@ -93,8 +93,20 @@ class Database:
             query += key + ", "
         query = query[:-2] + ") VALUES ('" + str(last_id+1) + "', "
         for key, value in data.items():
-            query += "'" + str(value).replace("'", str("\'")) + "', "
+            query += "'" + str(value).replace("'", str('"')) + "', "
         query = query[:-2] + ");"
+        self.connect_to_db()
+        try:
+            self.__cursor.execute(query)
+            self.__connection.commit()
+            return self.select_row(table_name, 'id', last_id+1)
+        except (Exception, psycopg2.Error) as error:
+            raise Exception(error)
+        finally:
+            self.close_db_connection()
+
+    def update_row(self, table_name, target_column, value, column_name, new_value):
+        query = "UPDATE " + table_name + " SET " + column_name + " = '" + str(new_value) + "' WHERE " + target_column + " = '" + str(value) + "'"
         self.connect_to_db()
         try:
             self.__cursor.execute(query)
@@ -104,8 +116,8 @@ class Database:
         finally:
             self.close_db_connection()
 
-    def update_row(self, table_name, target_column, value, column_name, new_value):
-        query = "UPDATE " + table_name + " SET " + column_name + " = '" + str(new_value) + "' WHERE " + target_column + " = '" + str(value) + "'"
+    def delete_row(self, table_name, target_column, value):
+        query = "DELETE FROM " + table_name + " WHERE " + target_column + " = '" + str(value) + "'"
         self.connect_to_db()
         try:
             self.__cursor.execute(query)
