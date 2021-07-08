@@ -68,6 +68,8 @@ class Database:
         db_data = self.execute_query(query)
         for row in db_data:
             data.append(dict(zip(table, row)))
+        # Sorting the data by id - reversed
+        data = sorted(data, key=lambda i: i['id'], reverse=True)
         return data
 
     def select_row(self, table_name, column_name, value):
@@ -93,6 +95,17 @@ class Database:
         for key, value in data.items():
             query += "'" + str(value).replace("'", str("\'")) + "', "
         query = query[:-2] + ");"
+        self.connect_to_db()
+        try:
+            self.__cursor.execute(query)
+            self.__connection.commit()
+        except (Exception, psycopg2.Error) as error:
+            raise Exception(error)
+        finally:
+            self.close_db_connection()
+
+    def update_row(self, table_name, target_column, value, column_name, new_value):
+        query = "UPDATE " + table_name + " SET " + column_name + " = '" + str(new_value) + "' WHERE " + target_column + " = '" + str(value) + "'"
         self.connect_to_db()
         try:
             self.__cursor.execute(query)
