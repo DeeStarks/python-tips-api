@@ -12,9 +12,6 @@ from django.core.exceptions import ObjectDoesNotExist
 # Create your views here.
 @api_view(['GET'])
 def fetch_tips(request):
-    tip_keywords = ["need", "to", "sort", "a", "list", "by", "multiple", "criteria?", "use", "key", "lambda", "detail", "on"]
-
-
     data = {
         "status": True,
         "message": "Fetched successfully"
